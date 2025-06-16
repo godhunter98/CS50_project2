@@ -1,36 +1,36 @@
 import sqlite3
 import sys
 import argparse
+from database import fetch_price,add_to_db
 
 parser = argparse.ArgumentParser(
                     prog='sql_portfolio_db',
                     description='Sets up your portfolio in an SQLite databse, that you can query when needed',
-                    epilog='Text at the bottom of help')
+                    epilog='Happy analysing! 📈 💸')
 
 parser.add_argument("-a",help = "Add the security to portfolio",type=str)
+parser.add_argument("-p",help = "Fetch the price of a single security ",type=str)
 parser.add_argument("-q",help = "What quantity do you own?",type=int)
-parser.add_argument("-s",help = "Show the current portfolio")
-parser.add_argument("e",help = "Exit the program")
+parser.add_argument("-s",help = "Show the current portfolio",action="store_true")
+parser.add_argument("-e",help = "Exit the program",action='store_true')
 args = parser.parse_args()
 
-while True:
-    if args.a and args.q:
-        print(args)
-    elif args.e:
-        sys.exit("Exiting the program!")
+
+if args.a and args.q:
+    security = args.a
+    quantity = int(args.q)
+    print(security,quantity)
+    price = fetch_price(security)
+    print(price)
+    result = add_to_db(security,quantity,'portfolio.db')
+    print(f'Trade id: {result['id']} for security {result['ticker']}, at price ${result['current_price']}, logged on {result['date_added']}!')
+
+elif args.p:
+    argument = str(args.p)
+    if argument.endswith('.NS'):
+        print(f'The stock, {args.p} currently trades at:- ₹{fetch_price(args.p)}')
     else:
-        print('You need to input something!')
+        print(f'The stock, {args.p} currently trades at:- ${fetch_price(args.p)}')
 
-
-
-
-# # setting up our db connection and a cursor to execute queries
-# con = sqlite3.connect('portfolio.db')
-# cur = con.cursor()
-
-# def main():
-#     print("Hello from cs50-project2!")
-
-
-# if __name__ == "__main__":
-#     main()
+else:
+    pass
