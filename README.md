@@ -40,12 +40,12 @@ python portfolio_tool.py [options]
 ```bash 
 python portfolio_tool.py -a AAPL -q 10
 ```
-![alt text](image-3.png)
+![alt text](assets/image-3.png)
 
 ```bash 
 python portfolio_tool.py -s
 ```
-![alt text](image-1.png)
+![alt text](assets/image-1.png)
 
 ## 📁 Data Storage
 All your portfolio data is stored in a local <ins>SQLite</ins> database: portfolio.db
