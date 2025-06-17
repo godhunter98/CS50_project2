@@ -1,6 +1,8 @@
 import sqlite3
 import yfinance as yf
 from datetime import date
+import tabulate
+import sys
 
 DB_PATH = 'portfolio.db'
 
@@ -64,6 +66,34 @@ def add_to_db(security: str, quantity: float, db_path: str = DB_PATH) -> dict:
       'date_added':     today
     }
 
+def fetch_portfolio(db_path: str):
+    con = sqlite3.connect(db_path)
+
+    try:
+        cur = con.cursor()
+        cur.execute("""
+        SELECT 
+            ticker,
+            ROUND(AVG(current_price), 2) AS avg_price,
+            SUM(quantity) AS total_qty,
+            ROUND(SUM(total_position), 2) AS total_position
+        FROM portfolio
+        GROUP BY ticker;
+        """)
+
+        portfolio_data = cur.fetchall()
+        total_portfolio = sum(row[3] for row in portfolio_data)
+        headers = ['ticker', 'Avg_Price', 'Qty', 'Total_Position']
+        portfolio_data = tabulate.tabulate(portfolio_data, tablefmt="grid", headers=headers)
+        return portfolio_data, total_portfolio
+
+    except sqlite3.OperationalError as e:
+        if "no such table" in str(e):
+            sys.exit("❌ The portfolio table does not exist. Please add a trade first.")
+        else:
+            sys.exit(f"❌ Database error: {e}")
+
+
 def main():
     ticker   = input("Ticker to add: ").strip()
     quantity = float(input("Quantity: "))
@@ -72,6 +102,6 @@ def main():
           f"{summary['quantity']}× {summary['ticker']} @ "
           f"{summary['current_price']} each "
           f"(total {summary['total_position']}) on {summary['date_added']}")
-
+    
 if __name__ == "__main__":
     main()
