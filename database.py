@@ -66,7 +66,7 @@ def add_to_db(security: str, quantity: float, db_path: str = DB_PATH) -> dict:
       'date_added':     today
     }
 
-def fetch_portfolio(db_path: str):
+def fetch_portfolio(db_path: str)->dict:
     con = sqlite3.connect(db_path)
 
     try:
